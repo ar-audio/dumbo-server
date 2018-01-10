@@ -14,7 +14,7 @@ This will start two containers, one for the node application and one for the dat
 
 ``` bash
 $ docker exec -it dumboserver_web_1 /bin/sh
-``
+```
 
 ## Migrations
 
