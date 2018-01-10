@@ -9,20 +9,29 @@ const fs = require('fs')
 const path = require('path')
 const names = String(fs.readFileSync(path.resolve('assets/dict/propernames'))).split('\n').map(name => name.toLocaleLowerCase())
 
-const MAX_TRIES = 10
+
+function newPlayer (ip) {
+  return db.table('players')
+    .insert({ ip }, { returnChanges: true })
+    .run()
+    .then(result => result.changes[0].new_val)
+}
+
+const MAX_GAME_CREATION_TRIES = 10
 
 /**
  * This starts a new game that is guaranteed to have a unique name
+ * @return Promise
  */
-function newGame (tries = 1) {
+function newGame (player1, tries = 1) {
   // abort after x tries, otherwise people could crash this by calling it often enough
-  if (tries > MAX_TRIES) return Promise.reject(new Error('Could not create new game'))
+  if (tries > MAX_GAME_CREATION_TRIES) return Promise.reject(new Error('Could not create new game'))
 
   const now = Date.now()
   return db.table('games')
     .insert({
       name: generateName(names),
-      players: [],
+      players: [player1],
       createdAt: now,
       updatedAt: now
     }, {
@@ -40,16 +49,18 @@ function findGame (name) {
 // set up the routes which are going to be exported
 router
   .post('/', async ctx => {
-    const game = await newGame()
+    const player = await newPlayer(ctx.ip)
+    const game = await newGame(player)
     ctx.status = 201
-    ctx.body = { game }
+    ctx.body = game
   })
   .get('/:name', async ctx => {
     const game = await findGame(ctx.params.name)
     if (game != null) {
-      ctx.body = { game }
+      ctx.body = game
     } else {
       ctx.status = 404
+      ctx.body = { 'message': `No game found with name ${ctx.params.name}` }
     }
   })
 
