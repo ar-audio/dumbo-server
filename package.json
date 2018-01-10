@@ -6,17 +6,25 @@
   "scripts": {
     "test": "mocha",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "migrate": "rethinkdb-migrate -f migrations/config.js"
   },
   "author": "Arne Schlüter <arne@schlueter.is>",
   "license": "ISC",
   "dependencies": {
     "koa": "^2.4.1",
     "koa-logger": "^3.1.0",
-    "koa-router": "^7.3.0"
+    "koa-router": "^7.3.0",
+    "rethinkdb-migrate": "^1.2.2",
+    "rethinkdbdash": "^2.3.31"
   },
   "devDependencies": {
+    "eslint": "^4.15.0",
     "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
     "nodemon": "^1.14.10"
   }
 }

@@ -8,8 +8,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DUMBO_PORT=3000
+      - PORT=3000
+      - DATABASE_HOST=rethinkdb
+      - DATABASE_NAME=dumbo
   rethinkdb:
     image: rethinkdb:2.3.6
     ports:
+      - "28015:28015"
       - "8080:8080"
