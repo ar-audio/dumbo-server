@@ -1,0 +1,13 @@
+version: '3'
+services:
+  web:
+    build: .
+    command: npm run dev
+    volumes:
+      - ".:/usr/src/app"
+    ports:
+      - "3000:3000"
+    environment:
+      - DUMBO_PORT=3000
+  rethinkdb:
+    image: rethinkdb:2.3.6

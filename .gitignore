@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/node
 
+# Ignore emacs tmp files
+.*.swp
+
 ### Node ###
 # Logs
 logs
