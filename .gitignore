@@ -1,7 +1,7 @@
 
 # Created by https://www.gitignore.io/api/node
 
-# Ignore emacs tmp files
+# Ignore emacs swap files
 .*.swp
 
 ### Node ###

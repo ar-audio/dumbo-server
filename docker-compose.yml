@@ -11,3 +11,5 @@ services:
       - DUMBO_PORT=3000
   rethinkdb:
     image: rethinkdb:2.3.6
+    ports:
+      - "8080:8080"
