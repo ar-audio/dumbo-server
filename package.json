@@ -1,0 +1,22 @@
+{
+  "name": "dumbo-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Arne Schlüter <arne@schlueter.is>",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.4.1",
+    "koa-logger": "^3.1.0",
+    "koa-router": "^7.3.0"
+  },
+  "devDependencies": {
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "nodemon": "^1.14.10"
+  }
+}
