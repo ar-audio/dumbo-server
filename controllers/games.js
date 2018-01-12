@@ -39,7 +39,7 @@ function newGame (player1, tries = 1) {
       returnChanges: true
     })
     .run()
-    .then(result => result.changes.length ? result.changes[0].new_val : newGame(++tries))
+    .then(result => result.changes.length ? result.changes[0].new_val : newGame(player1, ++tries))
 }
 
 function findGame (name) {
