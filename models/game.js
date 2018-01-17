@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 // required for game name generation
 const fs = require('fs')
 const path = require('path')
@@ -6,7 +8,14 @@ const names = String(fs.readFileSync(path.resolve('assets/dict/propernames'))).s
 const generateName = require('../utils/generate-name.js')
 
 const MAX_GAME_CREATION_TRIES = 10
-module.exports = {
+
+function tooBusyError () {
+  const err = new Error('Maximum number of players exceeded')
+  err.name = 'TooBusyError'
+  return err
+}
+
+const Game = {
   /**
    * Starts a new game that is guaranteed to have a unique name.
    *
@@ -28,17 +37,52 @@ module.exports = {
         returnChanges: true
       })
       .run()
-      .then(result => result.changes.length ? result.changes[0].new_val : newGame(player1, ++tries))
+      .then(result => {
+        if (result.changes.length) {
+          const change = result.changes[0].new_val
+          return {
+            ...change,
+            players: _.map(change.players, 'id')
+          }
+        } else {
+          return Game.create(db, player1, ++tries)
+        }
+      })
   },
 
   get (db, name) {
     return db.table('games').get(name)
       .run()
-      .then(result => result != null
-        // remove tokens from result
-        ? {...result, players: result.players.map(({id, token}) => ({id}))}
-        : result
-      )
+      .then(result => {
+        if (result == null) return
+        return {
+          ...result,
+          // remove tokens from result
+          players: _.map(result.players, 'id')
+        }
+      })
+  },
+
+  join (db, name, player) {
+    return db.table('games').get(name)
+      .update(game => db.branch(
+        game('players').count().lt(2),
+        { players: game('players').append(player) },
+        null
+      ), {returnChanges: true})
+      .run()
+      .then(result => {
+        if (!result.changes.length) {
+          throw tooBusyError()
+        }
+
+        console.log('update result', result.changes[0])
+        const change = result.changes[0].new_val
+        return {
+          ...change,
+          players: _.map(change.players, 'id')
+        }
+      })
   },
 
   delete () {
@@ -54,3 +98,5 @@ module.exports = {
     return Promise.reject(new Error('TODO: Implement me'))
   }
 }
+
+module.exports = Game
