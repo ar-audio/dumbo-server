@@ -15,6 +15,10 @@ function tooBusyError () {
   return err
 }
 
+function hideToken (obj) {
+  return _.omit(obj, 'token')
+}
+
 const Game = {
   /**
    * Starts a new game that is guaranteed to have a unique name.
@@ -42,7 +46,7 @@ const Game = {
           const change = result.changes[0].new_val
           return {
             ...change,
-            players: _.map(change.players, 'id')
+            players: _.map(change.players, hideToken)
           }
         } else {
           return Game.create(db, player1, ++tries)
@@ -58,7 +62,7 @@ const Game = {
         return {
           ...result,
           // remove tokens from result
-          players: _.map(result.players, 'id')
+          players: _.map(result.players, hideToken)
         }
       })
   },
@@ -80,13 +84,54 @@ const Game = {
         const change = result.changes[0].new_val
         return {
           ...change,
-          players: _.map(change.players, 'id')
+          players: _.map(change.players, hideToken)
         }
       })
   },
 
-  delete () {
-    return Promise.reject(new Error('TODO: Implement me'))
+  /**
+   * Pushes updates about a game on a websocket
+   */
+  watch (db, name, socket) {
+    let numPlayers = 0
+    const channel = socket.get().of(name)
+    console.log('Opened channel', name)
+
+    channel.on('connection', client => {
+      numPlayers++
+      console.log(`Connection on channel ${name}, players active: ${numPlayers}`)
+
+      // TODO: Emit movements, make sure to only push valid changes
+      client.on('movement', message => {
+        console.log('Received message in', name)
+        console.log(message)
+      })
+
+      client.on('disconnect', _ => {
+        numPlayers--
+        if (numPlayers === 0) {
+          // TODO: Delete channel
+        }
+      })
+    })
+
+    // return db.table('games').get(name)
+    //   .changes()
+    //   .run((err, cursor) => {
+    //     if (err) {
+    //       console.error('Error in changefeed of', name)
+    //       console.error(err)
+    //       return
+    //     }
+
+    //     console.log('Got changes in game', name)
+    //     console.log('Change callback called with args:', arguments)
+    //     cursor.each(c => {
+    //       console.log('cursor', cursor)
+    //       channel.emit('movement', cursor)
+    //     })
+    //     channel.emit('test', 'hey there, this is a test')
+    //  })
   },
 
   /**

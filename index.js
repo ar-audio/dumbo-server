@@ -7,6 +7,8 @@ const Koa = require('koa')
 const logger = require('koa-logger')
 const Router = require('koa-router')
 
+const socket = require('./utils/socket.js')
+
 const app = new Koa()
 app.use(logger())
 
@@ -15,9 +17,6 @@ const connectToDatabase = () => {
   console.log('Connecting to database...')
   return require('./utils/database.js')
 }
-
-const foo = "bar";
-const blerg = true;
 
 // mount all controllers in `./controllers` and use their filename as prefix
 const mountControllers = () => {
@@ -43,13 +42,16 @@ const mountControllers = () => {
   })
 }
 
-// start the app and ready steady go
 Promise.all(
   [
     mountControllers(),
     connectToDatabase()
   ])
-  .then(() => app.listen(PORT, () => {
-    console.log(`Server started and listening on port ${PORT}`)
-  }))
+  .then(() => {
+    console.log('Initializing socket.io...')
+    return socket.init(app)
+  })
+  .then(server => server.listen(
+    PORT, () => console.log(`Server started and listening on port ${PORT}`)
+  ))
   .catch(err => console.error(err))
