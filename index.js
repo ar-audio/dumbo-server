@@ -16,6 +16,9 @@ const connectToDatabase = () => {
   return require('./utils/database.js')
 }
 
+const foo = "bar";
+const blerg = true;
+
 // mount all controllers in `./controllers` and use their filename as prefix
 const mountControllers = () => {
   console.log('Mounting controllers...')

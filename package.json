@@ -12,6 +12,7 @@
   "author": "Arne Schlüter <arne@schlueter.is>",
   "license": "ISC",
   "dependencies": {
+    "crypto-random-string": "^1.0.0",
     "koa": "^2.4.1",
     "koa-logger": "^3.1.0",
     "koa-router": "^7.3.0",
