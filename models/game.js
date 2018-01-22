@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const debug = require('debug')('dumbo:models:game')
 
 // required for game name generation
 const fs = require('fs')
@@ -15,10 +15,6 @@ function tooBusyError () {
   return err
 }
 
-function hideToken (obj) {
-  return _.omit(obj, 'token')
-}
-
 const Game = {
   /**
    * Starts a new game that is guaranteed to have a unique name.
@@ -26,14 +22,15 @@ const Game = {
    * @return Promise
    */
   create (db, player1, tries = 1) {
+    debug(`${player1.id} trying to create new game`)
     // abort after x tries, otherwise people could crash this by calling it often enough
     if (tries > MAX_GAME_CREATION_TRIES) return Promise.reject(new Error('Could not create new game'))
 
-    const now = Date.now()
+    const now = db.now()
     return db.table('games')
       .insert({
         name: generateName(names),
-        players: [player1],
+        players: [player1.id],
         createdAt: now,
         updatedAt: now
       }, {
@@ -44,11 +41,10 @@ const Game = {
       .then(result => {
         if (result.changes.length) {
           const change = result.changes[0].new_val
-          return {
-            ...change,
-            players: _.map(change.players, hideToken)
-          }
+          debug(`Created game ${change.name}`)
+          return change
         } else {
+          debug('Recurring. Game with name already exists.')
           return Game.create(db, player1, ++tries)
         }
       })
@@ -59,79 +55,39 @@ const Game = {
       .run()
       .then(result => {
         if (result == null) return
-        return {
-          ...result,
-          // remove tokens from result
-          players: _.map(result.players, hideToken)
-        }
+        return result
       })
   },
 
-  join (db, name, player) {
+  join (db, name, player, socket) {
+    debug(`Player ${player.id} trying to join ${name}`)
     return db.table('games').get(name)
       .update(game => db.branch(
         game('players').count().lt(2),
-        { players: game('players').append(player) },
+        { players: game('players').append(player.id) },
         null
       ), {returnChanges: true})
       .run()
       .then(result => {
         if (!result.changes.length) {
+          debug(`Too many players in ${name}`)
           throw tooBusyError()
         }
 
-        console.log('update result', result.changes[0])
         const change = result.changes[0].new_val
-        return {
-          ...change,
-          players: _.map(change.players, hideToken)
-        }
+        debug(`Players in ${name}: ${change.players.join(',')}`)
+        return change
       })
   },
 
   /**
-   * Pushes updates about a game on a websocket
+   * This method simply updates a timestamp to prevent games from being deleted
    */
-  watch (db, name, socket) {
-    let numPlayers = 0
-    const channel = socket.get().of(name)
-    console.log('Opened channel', name)
-
-    channel.on('connection', client => {
-      numPlayers++
-      console.log(`Connection on channel ${name}, players active: ${numPlayers}`)
-
-      // TODO: Emit movements, make sure to only push valid changes
-      client.on('movement', message => {
-        console.log('Received message in', name)
-        console.log(message)
-      })
-
-      client.on('disconnect', _ => {
-        numPlayers--
-        if (numPlayers === 0) {
-          // TODO: Delete channel
-        }
-      })
-    })
-
-    // return db.table('games').get(name)
-    //   .changes()
-    //   .run((err, cursor) => {
-    //     if (err) {
-    //       console.error('Error in changefeed of', name)
-    //       console.error(err)
-    //       return
-    //     }
-
-    //     console.log('Got changes in game', name)
-    //     console.log('Change callback called with args:', arguments)
-    //     cursor.each(c => {
-    //       console.log('cursor', cursor)
-    //       channel.emit('movement', cursor)
-    //     })
-    //     channel.emit('test', 'hey there, this is a test')
-    //  })
+  recordActivity (db, name) {
+    return db.table('games').get(name)
+      .update({updatedAt: db.now()})
+      .run()
+      .then(result => result.replaced === 1)
   },
 
   /**

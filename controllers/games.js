@@ -1,7 +1,6 @@
 const Router = require('koa-router')
 
 const db = require('../utils/database.js')
-const socket = require('../utils/socket.js')
 const Player = require('../models/player.js')
 const Game = require('../models/game.js')
 
@@ -14,7 +13,6 @@ router
     const player = await Player.create(db)
     const game = await Game.create(db, player)
     try {
-      await Game.watch(db, game.name, socket)
       ctx.status = 201
       ctx.body = {
         game,

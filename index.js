@@ -1,4 +1,5 @@
 const { PORT } = process.env
+const debug = require('debug')('dumbo:app')
 
 const fs = require('fs')
 const path = require('path')
@@ -7,20 +8,20 @@ const Koa = require('koa')
 const logger = require('koa-logger')
 const Router = require('koa-router')
 
-const socket = require('./utils/socket.js')
+const io = require('./utils/io.js')
 
 const app = new Koa()
 app.use(logger())
 
 // initialize the database singleton
 const connectToDatabase = () => {
-  console.log('Connecting to database...')
+  debug('Connecting to database...')
   return require('./utils/database.js')
 }
 
 // mount all controllers in `./controllers` and use their filename as prefix
 const mountControllers = () => {
-  console.log('Mounting controllers...')
+  debug('Mounting controllers...')
   return new Promise((resolve, reject) => {
     fs.readdir(path.resolve('controllers'), (err, files) => {
       if (err) return reject(err)
@@ -34,7 +35,7 @@ const mountControllers = () => {
           router.use(`/${prefix}`, controller.routes())
           app.use(router.routes())
           app.use(router.allowedMethods())
-          console.log(`Mounted ${path.resolve('controllers', file)} under /${prefix}`)
+          debug(`Mounted ${path.resolve('controllers', file)} under /${prefix}`)
         })
 
       resolve()
@@ -48,10 +49,10 @@ Promise.all(
     connectToDatabase()
   ])
   .then(() => {
-    console.log('Initializing socket.io...')
-    return socket.init(app)
+    debug('Initializing socket.io...')
+    return io.init(app)
   })
   .then(server => server.listen(
-    PORT, () => console.log(`Server started and listening on port ${PORT}`)
+    PORT, () => debug(`Server started and listening on port ${PORT}`)
   ))
   .catch(err => console.error(err))
