@@ -37,9 +37,9 @@ function init (app) {
           Game.recordActivity(db, gameName)
           // broadcast own movements to all other players in the room
           socket.on('movement', message => {
-            debug(`${id} is moving`)
+            debug(`Player ${id} is moving`)
             Game.recordActivity(db, gameName)
-            const {position} = message
+            const {position} = JSON.parse(message)
             socket.broadcast.to(gameName).emit('status', {id, position})
           })
         })
