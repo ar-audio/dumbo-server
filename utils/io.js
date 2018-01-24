@@ -42,6 +42,10 @@ function init (app) {
             const {latitude, longitude, accuracy} = JSON.parse(message)
             socket.broadcast.to(gameName).emit('location', {id, latitude, longitude, accuracy})
           })
+          socket.on('join', _ => {
+            debug(`${id} joined game`)
+            socket.broadcast.to(gameName).emit('join', {id})
+          })
           socket.on('abort', _ => {
             debug(`${id} aborted game`)
             socket.broadcast.to(gameName).emit('abort', {id})
