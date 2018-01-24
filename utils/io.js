@@ -31,20 +31,23 @@ function init (app) {
       Player.authorize(db, {id, token, gameName})
         .then(_ => {
           debug(`${id} authorized succesfully`)
+          let sentJoinEvent = false
           // allow player to receive message in the room representing their
           // current game
           socket.join(gameName)
           Game.recordActivity(db, gameName)
           // all socket events are broadcast to all other players in the room
           socket.on('location', message => {
+            if (!sentJoinEvent) {
+              debug(`${id} joined game`)
+              socket.broadcast.to(gameName).emit('join', {id})
+              sentJoinEvent = true
+            }
+
             debug(`${id} is moving`)
             Game.recordActivity(db, gameName)
             const {latitude, longitude, accuracy} = JSON.parse(message)
             socket.broadcast.to(gameName).emit('location', {id, latitude, longitude, accuracy})
-          })
-          socket.on('join', _ => {
-            debug(`${id} joined game`)
-            socket.broadcast.to(gameName).emit('join', {id})
           })
           socket.on('abort', _ => {
             debug(`${id} aborted game`)
