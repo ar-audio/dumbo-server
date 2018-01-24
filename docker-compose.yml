@@ -10,7 +10,7 @@ services:
     environment:
       - PORT=3000
       - DATABASE_HOST=rethinkdb
-      - DATABASE_NAME=dumbo
+      - DATABASE_NAME=marcopolo
       - DEBUG=dumbo:*
   rethinkdb:
     image: rethinkdb:2.3.6
