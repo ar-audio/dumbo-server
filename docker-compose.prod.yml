@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    build: .
+    command: npm start
+    volumes:
+      - ".:/usr/src/app"
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DATABASE_HOST=rethinkdb
+      - DATABASE_NAME=marcopolo
+      - DEBUG=dumbo:*
+  rethinkdb:
+    image: rethinkdb:2.3.6
+    ports:
+      - "28015:28015"

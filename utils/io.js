@@ -53,9 +53,9 @@ function init (app) {
             debug(`${id} aborted game`)
             socket.broadcast.to(gameName).emit('abort', {id})
           })
-          socket.on('gameOver', _ => {
+          socket.on('gotCaught', _ => {
             debug(`${id} sent game over message`)
-            socket.broadcast.to(gameName).emit('gameOver', {id})
+            socket.broadcast.to(gameName).emit('gotCaught', {id})
           })
         })
         .catch(error => {
