@@ -44,10 +44,10 @@ function init (app) {
               sentJoinEvent = true
             }
 
-            debug(`${id} is moving`)
-            Game.recordActivity(db, gameName)
             const {latitude, longitude, accuracy} = JSON.parse(message)
-            socket.broadcast.to(gameName).emit('location', {id, latitude, longitude, accuracy})
+            const broadcastMessage = {id, latitude, longitude, accuracy}
+            socket.broadcast.to(gameName).emit('location', broadcastMessage)
+            debug(`movement: ${JSON.stringify(broadcastMessage)}`)
           })
           socket.on('abort', _ => {
             debug(`${id} aborted game`)
