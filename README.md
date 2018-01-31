@@ -1,19 +1,19 @@
-# Dumbo Game Server
+# Marco Polo Server
 
-This is the server for the dumbo game. It's a [koa](https://github.com/koajs/koa) app talking to a [rethinkdb](https://github.com/rethinkdb/rethinkdb) instance.
+This is the server for the marco polo game. It's a [koa](https://github.com/koajs/koa) app talking to a [rethinkdb](https://github.com/rethinkdb/rethinkdb) instance. Player-to-player communication is realized using [socket.io](https://socket.io).
 
 ## Getting started
 
 The easiest way to set everything up is by using the provided `docker-compose` config:
 
 ``` bash
-$ docker-compose -p dumbo-server up
+$ docker-compose -p marco-polo up
 ```
 
 This will start two containers, one for the node application and one for the database. The rethinkdb admin interface is exposed via port 8080. If you need permanent storage for your database, mount `/data` as a volume. If you want to run stuff inside the containers, use `docker exec`. This would look similar to this:
 
 ``` bash
-$ docker exec -it dumboserver_web_1 /bin/sh
+$ docker exec -it marcopolo_web_1 /bin/sh
 ```
 
 ## Migrations
