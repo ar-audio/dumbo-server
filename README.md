@@ -1,4 +1,4 @@
-# Dumbo Game Server
+# Marco Polo Server
 
 This is the server for the marco polo game. It's a [koa](https://github.com/koajs/koa) app talking to a [rethinkdb](https://github.com/rethinkdb/rethinkdb) instance.
 
