@@ -1,5 +1,5 @@
 const { PORT } = process.env
-const debug = require('debug')('dumbo:app')
+const debug = require('debug')('marco-polo:app')
 
 const fs = require('fs')
 const path = require('path')

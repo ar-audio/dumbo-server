@@ -11,7 +11,7 @@ services:
       - PORT=3000
       - DATABASE_HOST=rethinkdb
       - DATABASE_NAME=marcopolo
-      - DEBUG=dumbo:*
+      - DEBUG="marco-polo:*"
   rethinkdb:
     image: rethinkdb:2.3.6
     ports:

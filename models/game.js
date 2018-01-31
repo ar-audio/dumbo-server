@@ -1,4 +1,4 @@
-const debug = require('debug')('dumbo:models:game')
+const debug = require('debug')('marco-polo:models:game')
 
 // required for game name generation
 const fs = require('fs')

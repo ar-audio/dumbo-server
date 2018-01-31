@@ -4,7 +4,7 @@ const db = require('./database.js')
 const Player = require('../models/player.js')
 const Game = require('../models/game.js')
 
-const debug = require('debug')('dumbo:sockets')
+const debug = require('debug')('marco-polo:sockets')
 
 let io = null
 

@@ -1,4 +1,4 @@
-const debug = require('debug')('dumbo:models:player')
+const debug = require('debug')('marco-polo:models:player')
 const generateToken = require('../utils/generate-token.js')
 
 module.exports = {
